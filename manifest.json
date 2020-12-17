@@ -1,0 +1,26 @@
+{
+  "manifest_version": 2,
+  "name": "Church Bulk SMS",
+  "short_name": "Church SMS",
+  "description": "Send templated text messages through Google Messages using your phone number.",
+  "version": "0.0.1",
+  "browser_action": {
+    "default_title": "Church Bulk SMS",
+    "default_icon": "icon_128.png",
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://messages.google.com/web/*"],
+      "js": [
+        "contentScripts/utils.js",
+        "contentScripts/googleMessagesBulkText.js"
+      ],
+      "all_frames": true
+    }
+  ],
+  "icons": {
+    "48": "icon_48.png",
+    "128": "icon_128.png"
+  }
+}

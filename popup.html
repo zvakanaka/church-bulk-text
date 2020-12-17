@@ -1,0 +1,63 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Church Bulk SMS hm</title>
+  <style>
+    body {
+      width: 250px;
+    }
+    textarea {
+      margin: 0px; width: 250px; height: 70px;
+    }
+    button {
+      margin-top: 1em;
+      margin-bottom: 2em;
+    }
+    .small-note {
+      text-align: right;
+    }
+    h2 {
+      margin-bottom: 0.25em;
+    }
+  </style>
+</head>
+<body>
+  <h1>Church Bulk SMS</h1>
+  <div class="page-not-supported">
+    <div class="tip">
+      Go to <a href="https://messages.google.com">Messages for Web</a> to use this extension.
+    </div>
+  </div>
+
+  <div class="loading">Loading...</div>
+
+  <div class="ui" hidden>
+    <div class="input-group">
+      <h2>Message</h2>
+      <textarea placeholder="e.g. Hello {name}, can you bring a treat to the church potluck?" class="message"></textarea>
+      <div class="tip">If you add "{name}" to your message it will be replaced by the corresponding name.</div>
+    </div>
+    <div class="input-group">
+      <h2>Numbers, names</h2>
+      <textarea placeholder="e.g. 1234567890, John Smith
+(111) 111 1111
+(987) 654 3210, Jane" class="numbers-and-names"></textarea>
+      <div class="numbers-and-names-errors" class="errors"></div>
+      <div class="tip">Example:
+        <pre>(123) 456-7890, John Smith
+(111) 111 1111
+(987) 654 3210, Jane</pre>
+      </div>
+      <input id="i-agree-that-i-have-read-the-google-messages-terms-and-conditions-and-am-fully-responsible-for-my-use-of-this-extension" type="checkbox" />
+      <label for="i-agree-that-i-have-read-the-google-messages-terms-and-conditions-and-am-fully-responsible-for-my-use-of-this-extension">I agree that I have read <a target="_blank" href="https://policies.google.com/terms">the Google Messages terms and conditions</a> and am fully responsible for my use of this extension.</label>
+      <button disabled class="send-messages">Send Messages</button>
+    </div>
+    <div class="small-note">
+      <small>Inspired by <a target="_blank" href="https://brismuth.com/how-to-send-bulk-customized-text-messages-with-google-voice-67b1b5b0ffe7">Google Voice Bulk Texter</a></small>
+    </div>
+  </div>
+</body>
+<script src="popup.js"></script>
+<script src="contentScripts/utils.js"></script>
+</html>
