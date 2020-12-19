@@ -65,3 +65,17 @@ function getRandomInt(min, max) {
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min) + min); //The maximum is exclusive and the minimum is inclusive
 }
+
+// filters out non-numerical characters
+function getNumber(str) {
+  const NUMBERS_ONLY_REGEXP = /[0-9]+/g
+  return (str.match(NUMBERS_ONLY_REGEXP) || []).join('')
+}
+
+/**
+ * Removes unicode characters from the text
+ * Thank you: brismuth
+ */
+function removeUnicode(text) {
+	return text.replace(/([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '');
+}
