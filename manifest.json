@@ -3,7 +3,7 @@
   "name": "Church Bulk SMS",
   "short_name": "Church SMS",
   "description": "Send templated text messages through Google Messages using your phone number.",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "browser_action": {
     "default_title": "Church Bulk SMS",
     "default_icon": "icon_128.png",
