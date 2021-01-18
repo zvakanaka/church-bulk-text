@@ -15,12 +15,35 @@ function showUI(supported) {
   if (supported) {
     document.querySelector('.ui').hidden = false;
     document.querySelector('.page-not-supported').hidden = true;
+    const advancedSimpleToggle = document.querySelector('.advanced-simple-toggle')
     const sendMessagesButton = document.querySelector('.send-messages')
     const conditionsInput = document.querySelector('#i-agree-that-i-have-read-the-google-messages-terms-and-conditions-and-am-fully-responsible-for-my-use-of-this-extension')
     conditionsInput.addEventListener('change', () => {
       sendMessagesButton.disabled = !conditionsInput.checked
     })
-    sendMessagesButton.addEventListener('click', sendMessages)
+    sendMessagesButton.addEventListener('click', () => {
+      const isAdvanced = !advancedSimpleToggle.textContent.toLocaleLowerCase().includes('advanced')
+      if (isAdvanced) {
+        console.warn('THIS SHOULD NEVER HAPPEN (control should be from the modal on the page because user is in advanced mode)')
+      } else {
+        sendMessages()
+      }
+    })
+    
+    advancedSimpleToggle.addEventListener('click', () => {
+      chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+        chrome.tabs.sendMessage(tabs[0].id, {
+          from: 'popup',
+          type: 'INIT_ADVANCED_MODE'
+        });
+      });
+      window.close();
+      // const isAdvanced = advancedSimpleToggle.textContent.toLocaleLowerCase().includes('advanced')
+      // advancedSimpleToggle.textContent = isAdvanced ? 'Switch to Simple' : 'Switch to Advanced'
+      // advancedSimpleHeading.textContent = isAdvanced ? 'Import CSV' : 'Numbers, names'
+      // advancedInputs.hidden = !isAdvanced
+      // simpleInputs.hidden = isAdvanced
+    })
   }
 }
 
@@ -41,7 +64,7 @@ function sendMessages() {
 }
 
 function getNamesAndNumbers(textAreaValue) {
-  return textAreaValue.split('\n').map((line, i) => {
+  return textAreaValue.trim().split('\n').map((line, i) => {
     const lineParts = line.split(',')
 
     return {

@@ -13,6 +13,7 @@
     {
       "matches": ["https://messages.google.com/web/*"],
       "js": [
+        "contentScripts/papaparse.min.js",
         "contentScripts/utils.js",
         "contentScripts/googleMessagesBulkText.js"
       ],

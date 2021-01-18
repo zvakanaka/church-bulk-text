@@ -2,7 +2,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Church Bulk SMS hm</title>
+  <title>Church Bulk SMS</title>
   <style>
     body {
       width: 250px;
@@ -20,6 +20,13 @@
     h2 {
       margin-bottom: 0.25em;
     }
+    .advanced-simple-toggle {
+      padding-left: 2ch;
+      font-size: 50%;
+      color: blue;
+      text-decoration: underline;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -35,19 +42,25 @@
   <div class="ui" hidden>
     <div class="input-group">
       <h2>Message</h2>
-      <textarea placeholder="e.g. Hello {name}, can you bring a treat to the church potluck?" class="message"></textarea>
+      <textarea placeholder="e.g. Hello {name}! Can you bring a dish or desert to the church potluck next Wednesday at 7pm?" class="message"></textarea>
       <div class="tip">If you add "{name}" to your message it will be replaced by the corresponding name.</div>
     </div>
     <div class="input-group">
-      <h2>Numbers, names</h2>
-      <textarea placeholder="e.g. 1234567890, John Smith
+      <h2><span class="advanced-simple-heading">Numbers, names</span><small class="advanced-simple-toggle">Switch to Advanced</small></h2>
+      <div class="simple-inputs">
+        <textarea placeholder="e.g. 1234567890, John Smith
 (111) 111 1111
 (987) 654 3210, Jane" class="numbers-and-names"></textarea>
-      <div class="numbers-and-names-errors" class="errors"></div>
-      <div class="tip">Example:
-        <pre>(123) 456-7890, John Smith
+        <div class="numbers-and-names-errors" class="errors"></div>
+        <div class="tip">Example:
+          <pre>(123) 456-7890, John Smith
 (111) 111 1111
 (987) 654 3210, Jane</pre>
+        </div>
+      </div>
+      <div hidden class="advanced-inputs">
+        <div class="csv-textarea-errors" class="errors"></div>
+        <!-- DRAG AND DROP HAD TO BE DONE ON THE ACTUAL PAGE, SEE popup.js for what happens when advanced mode is clicked -->
       </div>
       <input id="i-agree-that-i-have-read-the-google-messages-terms-and-conditions-and-am-fully-responsible-for-my-use-of-this-extension" type="checkbox" />
       <label for="i-agree-that-i-have-read-the-google-messages-terms-and-conditions-and-am-fully-responsible-for-my-use-of-this-extension">I agree that I have read <a target="_blank" href="https://policies.google.com/terms">the Google Messages terms and conditions</a> and am fully responsible for my use of this extension.</label>
@@ -58,6 +71,7 @@
     </div>
   </div>
 </body>
+<script src="contentScripts/papaparse.min.js"></script>
 <script src="popup.js"></script>
 <script src="contentScripts/utils.js"></script>
 </html>
