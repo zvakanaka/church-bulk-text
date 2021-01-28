@@ -15,6 +15,8 @@ function showUI(supported) {
   if (supported) {
     document.querySelector('.ui').hidden = false;
     document.querySelector('.page-not-supported').hidden = true;
+    const messageTextArea = document.querySelector('.message')
+    const namesAndNumbersTextArea = document.querySelector('.numbers-and-names')
     const advancedSimpleToggle = document.querySelector('.advanced-simple-toggle')
     const sendMessagesButton = document.querySelector('.send-messages')
     const conditionsInput = document.querySelector('#i-agree-that-i-have-read-the-google-messages-terms-and-conditions-and-am-fully-responsible-for-my-use-of-this-extension')
@@ -28,6 +30,21 @@ function showUI(supported) {
       } else {
         sendMessages()
       }
+    })
+
+    const existingMessageText = localStorage.getItem('extension-message')
+    if (existingMessageText) {
+      messageTextArea.value = existingMessageText
+    }
+    const existingNamesAndNumbers = localStorage.getItem('extension-namesAndNumbers')
+    if (existingNamesAndNumbers) {
+      namesAndNumbersTextArea.value = existingNamesAndNumbers
+    }
+    messageTextArea.addEventListener('change', () => {
+      localStorage.setItem('extension-message', messageTextArea.value);
+    })
+    namesAndNumbersTextArea.addEventListener('change', () => {
+      localStorage.setItem('extension-namesAndNumbers', namesAndNumbersTextArea.value);
     })
     
     advancedSimpleToggle.addEventListener('click', () => {

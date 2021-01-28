@@ -318,7 +318,7 @@ async function sendGroupMessage(message, recipients) {
   } else {
     throw new Error(`Unkown recipients format, '${typeof recipients}' for recipients: ${recipients}`)
   }
-  if (!location.pathname.startsWith('/web/conversations/') || Array.isArray(recipients)) {
+  if (!location.pathname.startsWith('/web/conversations/') || (Array.isArray(recipients) && recipients.length > 1)) {
     // must click next before sending group message
     await continueToConversation()
   }
