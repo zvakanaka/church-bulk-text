@@ -4,11 +4,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Church Bulk SMS</title>
   <style>
+    :root {
+      --popup-width: 300px;
+    }
     body {
-      width: 250px;
+      width: var(--popup-width);
     }
     textarea {
-      margin: 0px; width: 250px; height: 70px;
+      margin: 0px; width: var(--popup-width); height: 70px;
     }
     button {
       margin-top: 1em;
@@ -71,7 +74,8 @@
     </div>
   </div>
 </body>
-<script src="contentScripts/papaparse.min.js"></script>
-<script src="popup.js"></script>
-<script src="contentScripts/utils.js"></script>
+<script src="../vendor/browser-polyfill.min.js"></script>
+<script src="../contentScripts/papaparse.min.js"></script>
+<script src="./popup.js"></script>
+<script src="../contentScripts/utils.js"></script>
 </html>

@@ -1,4 +1,6 @@
-chrome.runtime.onMessage.addListener(async (message, sender, response) => {
+console.log('church-bulk-text extension loaded')
+browser.runtime.onMessage.addListener(async (message, sender, response) => {
+  console.log('received: ',message)
   if (message.from === 'popup' && message.type === 'SEND_MESSAGES') {
     const { messages, sendInterval } = message
     const messagesAndNumbers = treatMessagesAndNumbers(messages)
@@ -8,6 +10,7 @@ chrome.runtime.onMessage.addListener(async (message, sender, response) => {
 
   if (message.from === 'popup' && message.type === 'CHECK_TAB_SUPPORTED') {
     var url = window.location.href;
+    console.log('response url', url)
     response(url.startsWith('https://messages.google.com/'));
   }
   
@@ -191,6 +194,7 @@ chrome.runtime.onMessage.addListener(async (message, sender, response) => {
       })
     }, csvInput, drop)
   }
+  return true
 });
 
 /**
