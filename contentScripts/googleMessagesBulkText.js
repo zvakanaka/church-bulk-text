@@ -1,6 +1,9 @@
 console.log('church-bulk-text extension loaded')
+
+let statusInfo = null
+
 browser.runtime.onMessage.addListener(async (message, sender, response) => {
-  console.log('received: ',message)
+  console.log('received: ', message)
   if (message.from === 'popup' && message.type === 'SEND_MESSAGES') {
     const { messages, sendIntervalMin, sendIntervalMax } = message
     const messagesAndNumbers = treatMessagesAndNumbers(messages)
@@ -10,8 +13,11 @@ browser.runtime.onMessage.addListener(async (message, sender, response) => {
 
   if (message.from === 'popup' && message.type === 'CHECK_TAB_SUPPORTED') {
     var url = window.location.href;
-    console.log('response url', url)
     response(url.startsWith('https://messages.google.com/'));
+  }
+
+  if (message.from === 'popup' && message.type === 'GET_STATUS_INFO') {
+    return Promise.resolve(statusInfo)
   }
   
   if (message.from === 'popup' && message.type === 'INIT_ADVANCED_MODE') {
@@ -273,6 +279,12 @@ async function sendAllMessages(messagesAndNumbers, sendIntervalMin, sendInterval
     await till(() => location.pathname === messagesStartPage)
   }
 
+  // reset status information
+  browser.runtime.sendMessage({ funcName: 'displayStatusInfo', args: null })
+  statusInfo = null
+  browser.runtime.sendMessage({ funcName: 'displayStatusInfo', args: { progressRowIndex: 0 } })
+  statusInfo = { progressRowIndex: 0 }
+
   const n = messagesAndNumbers.length; // number of times to call promise
   await sequentialPromiseAll(
     sendGroupMessageAndWait, // function that returns a promise (will be called n times after previous one resolves)
@@ -282,11 +294,20 @@ async function sendAllMessages(messagesAndNumbers, sendIntervalMin, sendInterval
     argsHandle, // modify this in the callback to change the arguments at the next invocation
     _previousResponse, // what is resolved from promise
     i) => {
+    browser.runtime.sendMessage({ funcName: 'displayStatusInfo', args: { progressRowIndex: i } })
+    statusInfo = { progressRowIndex: i }
+
     argsHandle[0] = messagesAndNumbers[i].message;
     argsHandle[1] = messagesAndNumbers[i].numbers;
     argsHandle[2] = sendIntervalMin;
     argsHandle[3] = sendIntervalMax;
   });
+
+  browser.runtime.sendMessage({ funcName: 'displayStatusInfo', args: { progressRowIndex: n } })
+  statusInfo = { progressRowIndex: n }
+  await timeout(1000)
+  browser.runtime.sendMessage({ funcName: 'displayStatusInfo', args: null })
+  statusInfo = null
 }
 
 function sendGroupMessageAndWait(message, numberOrNumbers, waitMin, waitMax) {

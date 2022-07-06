@@ -29,6 +29,36 @@
       color: blue;
       text-decoration: underline;
       cursor: pointer;
+    } 
+    .completed:before {
+      content: '✓';
+      color: green;
+    }
+    /* https://codepen.io/StrengthandFreedom/pen/BaaQYqw */
+    .spinner {
+      animation: rotation 2s;
+      animation-iteration-count: infinite;
+      animation-timing-function: linear;
+      display: inline-block;
+      transform-origin: center;
+    }
+    .spinner:before {
+      content: '⌛';
+      color: orange;
+    }
+    .prefix {
+      margin-right: 8px;
+    }
+    .numbers-and-names-status-info {
+      font-family: 'Courier New', Courier, monospace;
+    }
+    @keyframes rotation {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(359deg);
+      }
     }
   </style>
 </head>
@@ -54,6 +84,7 @@
         <textarea placeholder="e.g. 1234567890, John Smith
 (111) 111 1111
 (987) 654 3210, Jane" class="numbers-and-names"></textarea>
+        <div class="numbers-and-names-status-info" hidden></div>
         <div class="numbers-and-names-errors" class="errors"></div>
         <div class="tip">Example:
           <pre>(123) 456-7890, John Smith

@@ -4,13 +4,21 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('supported', supported)
     showUI(supported);
 	});
-  localStorage.clearItem('church-bulk-text-status')
+
 });
 
 function currentlyOnSupportedTab(cb) {
 	browser.tabs.query({active: true, currentWindow: true}).then((tabs) => {
     console.log('sending message for ', tabs)
 		browser.tabs.sendMessage(tabs[0].id, {from: 'popup', type: 'CHECK_TAB_SUPPORTED'}, cb);
+	});
+}
+
+function getStatusInfo(cb) {
+	browser.tabs.query({active: true, currentWindow: true}).then((tabs) => {
+		browser.tabs.sendMessage(tabs[0].id, {from: 'popup', type: 'GET_STATUS_INFO'}).then((statusInfo) => {
+      cb(statusInfo);
+    });
 	});
 }
 
@@ -65,6 +73,9 @@ function showUI(supported) {
       // advancedInputs.hidden = !isAdvanced
       // simpleInputs.hidden = isAdvanced
     })
+    getStatusInfo((statusInfo) => {
+      displayStatusInfo(statusInfo.progressRowIndex)
+    });
   }
 }
 
@@ -113,4 +124,56 @@ function getFormattedMessages(namesAndNumbers, messageText) {
 function format(str, obj) {
   var regex = /{(.*?)}/g;
   return str.replace(regex, (m, c) => (obj)[c]);
+}
+
+browser.runtime.onMessage.addListener(
+  function (request, sender, sendResponse) {
+    if (request.funcName === 'displayStatusInfo') {
+      const progressRowIndex = request?.args?.progressRowIndex
+      displayStatusInfo(progressRowIndex)
+    }
+  }
+);
+
+function displayStatusInfo(progressRowIndex) {
+  const namesAndNumbersTextArea = document.querySelector('.numbers-and-names')
+  const namesAndNumbers = getNamesAndNumbers(namesAndNumbersTextArea.value)
+  const namesAndNumbersStatusInfo = document.querySelector('.numbers-and-names-status-info')
+  const messageTextArea = document.querySelector('.message')
+  const sendMessagesButton = document.querySelector('.send-messages')
+  const conditionsInput = document.querySelector('#i-agree-that-i-have-read-the-google-messages-terms-and-conditions-and-am-fully-responsible-for-my-use-of-this-extension')
+
+  if (typeof progressRowIndex !== 'number') {
+    namesAndNumbersTextArea.hidden = false;
+    namesAndNumbersStatusInfo.hidden = true;
+    namesAndNumbersStatusInfo.textContent = '';
+    messageTextArea.disabled = false;
+    conditionsInput.disabled = false;
+  } else {
+    namesAndNumbersStatusInfo.textContent = '';
+    namesAndNumbersTextArea.hidden = true;
+    namesAndNumbersStatusInfo.hidden = false;
+    messageTextArea.disabled = true;
+    sendMessagesButton.disabled = true;
+    conditionsInput.disabled = true;
+
+    namesAndNumbersTextArea.value.split('\n').forEach((line, i) => {
+      const progressRow = document.createElement('div')
+      const prefixSpan = document.createElement('span')
+      prefixSpan.classList.add('prefix')
+      progressRow.appendChild(prefixSpan)
+      const progressText = document.createElement('span')
+      progressText.textContent = line
+      if (progressRowIndex > i) {
+        prefixSpan.classList.add('completed')
+      } else if (progressRowIndex === i) {
+        prefixSpan.classList.add('spinner')
+        progressText.style.textDecoration = 'underline'
+      } else if (progressRowIndex < i) {
+        progressText.style.color = 'gray'
+      }
+      progressRow.appendChild(progressText)
+      namesAndNumbersStatusInfo.appendChild(progressRow)
+    })
+  }
 }
