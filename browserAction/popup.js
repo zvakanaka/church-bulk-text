@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('supported', supported)
     showUI(supported);
 	});
+  localStorage.clearItem('church-bulk-text-status')
 });
 
 function currentlyOnSupportedTab(cb) {
@@ -68,7 +69,8 @@ function showUI(supported) {
 }
 
 function sendMessages() {
-  const sendInterval = 2500;
+  const sendIntervalMin = 2500;
+  const sendIntervalMax = 10000;
   const messageTextArea = document.querySelector('.message')
   const namesAndNumbersTextArea = document.querySelector('.numbers-and-names')
   const namesAndNumbers = getNamesAndNumbers(namesAndNumbersTextArea.value)
@@ -78,7 +80,8 @@ function sendMessages() {
 			from: 'popup',
 			type: 'SEND_MESSAGES',
 			messages: messages,
-			sendInterval: sendInterval
+			sendIntervalMin,
+			sendIntervalMax
 		});
 	});
 }

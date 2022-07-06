@@ -2,10 +2,10 @@ console.log('church-bulk-text extension loaded')
 browser.runtime.onMessage.addListener(async (message, sender, response) => {
   console.log('received: ',message)
   if (message.from === 'popup' && message.type === 'SEND_MESSAGES') {
-    const { messages, sendInterval } = message
+    const { messages, sendIntervalMin, sendIntervalMax } = message
     const messagesAndNumbers = treatMessagesAndNumbers(messages)
 
-    await sendAllMessages(messagesAndNumbers, sendInterval)
+    await sendAllMessages(messagesAndNumbers, sendIntervalMin, sendIntervalMax)
   }
 
   if (message.from === 'popup' && message.type === 'CHECK_TAB_SUPPORTED') {
@@ -189,7 +189,7 @@ browser.runtime.onMessage.addListener(async (message, sender, response) => {
           return acc
         }, [])
         console.log(dedupedPreparedMessagesAndNumbers)
-        await sendAllMessages(dedupedPreparedMessagesAndNumbers, 4000)
+        await sendAllMessages(dedupedPreparedMessagesAndNumbers, 2500, 10000)
         alert(`Done sending messages`)
       })
     }, csvInput, drop)
@@ -264,7 +264,7 @@ function treatMessagesAndNumbers(messagesAndNumbers) {
   })
 }
 
-async function sendAllMessages(messagesAndNumbers, sendInterval) {
+async function sendAllMessages(messagesAndNumbers, sendIntervalMin, sendIntervalMax) {
   // get to the right page
   const messagesStartPage = '/web/conversations/new'
   if (location.pathname !== messagesStartPage) {
@@ -276,7 +276,7 @@ async function sendAllMessages(messagesAndNumbers, sendInterval) {
   const n = messagesAndNumbers.length; // number of times to call promise
   await sequentialPromiseAll(
     sendGroupMessageAndWait, // function that returns a promise (will be called n times after previous one resolves)
-    [messagesAndNumbers[0].message, messagesAndNumbers[0].numbers], // arguments array provided to promise
+    [messagesAndNumbers[0].message, messagesAndNumbers[0].numbers, undefined, undefined], // arguments array provided to promise
     n, // number of times to call promise
     ( // callback - invoked after each promise resolution
     argsHandle, // modify this in the callback to change the arguments at the next invocation
@@ -284,10 +284,12 @@ async function sendAllMessages(messagesAndNumbers, sendInterval) {
     i) => {
     argsHandle[0] = messagesAndNumbers[i].message;
     argsHandle[1] = messagesAndNumbers[i].numbers;
+    argsHandle[2] = sendIntervalMin;
+    argsHandle[3] = sendIntervalMax;
   });
 }
 
-function sendGroupMessageAndWait(message, numberOrNumbers) {
+function sendGroupMessageAndWait(message, numberOrNumbers, waitMin, waitMax) {
   return new Promise(async (resolve, reject) => {
     if (message.includes('undefined')) {
       reject(`message includes 'undefined': ${message}`)
@@ -295,8 +297,10 @@ function sendGroupMessageAndWait(message, numberOrNumbers) {
     console.group(`${numberOrNumbers}`);
     console.log(message)
     console.groupEnd(`${numberOrNumbers}`);
+    if (typeof waitMin === 'number' && typeof waitMax === 'number') {
+      await timeout(getRandomInt(waitMin, waitMax))
+    }
     await sendGroupMessage(message, numberOrNumbers)
-    await timeout(getRandomInt(3000, 10000))
     resolve(`message sent to ${numberOrNumbers}`)
   })
 }
