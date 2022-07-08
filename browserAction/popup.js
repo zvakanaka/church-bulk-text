@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
 function currentlyOnSupportedTab(cb) {
   browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
     console.log('sending message for ', tabs)
-    browser.tabs.sendMessage(tabs[0].id, { from: 'popup', type: 'CHECK_TAB_SUPPORTED' }, cb);
+    browser.tabs.sendMessage(tabs[0].id, { from: 'popup', type: 'CHECK_TAB_SUPPORTED' }).then((isSupported) => cb(isSupported));
   });
 }
 
@@ -60,7 +60,7 @@ function showUI(supported) {
     })
 
     advancedSimpleToggle.addEventListener('click', () => {
-      browser.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+      browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
         browser.tabs.sendMessage(tabs[0].id, {
           from: 'popup',
           type: 'INIT_ADVANCED_MODE'
@@ -87,7 +87,7 @@ function sendMessages() {
   const namesAndNumbersTextArea = document.querySelector('.numbers-and-names')
   const namesAndNumbers = getNamesAndNumbers(namesAndNumbersTextArea.value)
   const messages = getFormattedMessages(namesAndNumbers, messageTextArea.value)
-  browser.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+  browser.tabs.query({ active: true, currentWindow: true }).then( (tabs) => {
     browser.tabs.sendMessage(tabs[0].id, {
       from: 'popup',
       type: 'SEND_MESSAGES',
@@ -182,7 +182,8 @@ function displayStatusInfo(progressRowIndex, mode) {
         progressRow.appendChild(progressText)
         namesAndNumbersStatusInfo.appendChild(progressRow)
       })
-      namesAndNumbersStatusInfo.querySelector('.spinner').scrollIntoView()
+      const spinner = namesAndNumbersStatusInfo.querySelector('.spinner')
+      spinner?.scrollIntoView()
     }
   }
 }

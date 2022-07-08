@@ -10,7 +10,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "v2": "cp v2_manifest.json manifest.json",
     "v3": "cp v3_manifest.json manifest.json",
-    "zip": "zip $(node -e \"const m=require('./manifest.json');process.stdout.write(m.name.toLowerCase().replace(/\\s+/g,'-')+'-'+m.version+'-manifest-v'+m.manifest_version.toString())\").zip -r * -x .git screenshots/ screenshots/* v2_manifest.json v3_manifest.json .gitignore .DS_Store .npmrc *.zip @",
+    "zip": "zip $(node -e \"const m=require('./manifest.json');process.stdout.write(m.name.toLowerCase().replace(/\\s+/g,'-')+'-'+m.version+'-manifest-v'+m.manifest_version.toString())\").zip -r * -x .git screenshots/ screenshots/* v2_manifest.json v3_manifest.json .gitignore .DS_Store .npmrc icons/E248_color.xcf icons/icon-fullsize.png *.zip @",
     "icon_48": "convert ./icons/icon-fullsize.png -resize 48x48^ -background none -gravity center -extent 48x48 icons/icon_48.png",
     "icon_96": "convert ./icons/icon-fullsize.png -resize 96x96^ -background none -gravity center -extent 96x96 icons/icon_96.png",
     "icon_128": "convert ./icons/icon-fullsize.png -resize 128x128^ -background none -gravity center -extent 128x128 icons/icon_128.png",

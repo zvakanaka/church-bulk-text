@@ -304,12 +304,11 @@ async function sendAllMessages(messagesAndNumbers, sendIntervalMin, sendInterval
     argsHandle[2] = sendIntervalMin;
     argsHandle[3] = sendIntervalMax;
   });
-
+  
   sendStatus(n)
-  alert(`Done sending messages`)
   await timeout(1000)
   sendStatus(null)
-
+  alert(`Done sending messages`)
 }
 
 function sendGroupMessageAndWait(message, numberOrNumbers, waitMin, waitMax) {
