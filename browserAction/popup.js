@@ -1,25 +1,25 @@
 document.addEventListener('DOMContentLoaded', () => {
   console.log('domcontentloaded')
-	currentlyOnSupportedTab(function(supported) {
+  currentlyOnSupportedTab(function (supported) {
     console.log('supported', supported)
     showUI(supported);
-	});
+  });
 
 });
 
 function currentlyOnSupportedTab(cb) {
-	browser.tabs.query({active: true, currentWindow: true}).then((tabs) => {
+  browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
     console.log('sending message for ', tabs)
-		browser.tabs.sendMessage(tabs[0].id, {from: 'popup', type: 'CHECK_TAB_SUPPORTED'}, cb);
-	});
+    browser.tabs.sendMessage(tabs[0].id, { from: 'popup', type: 'CHECK_TAB_SUPPORTED' }, cb);
+  });
 }
 
 function getStatusInfo(cb) {
-	browser.tabs.query({active: true, currentWindow: true}).then((tabs) => {
-		browser.tabs.sendMessage(tabs[0].id, {from: 'popup', type: 'GET_STATUS_INFO'}).then((statusInfo) => {
+  browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
+    browser.tabs.sendMessage(tabs[0].id, { from: 'popup', type: 'GET_STATUS_INFO' }).then((statusInfo) => {
       cb(statusInfo);
     });
-	});
+  });
 }
 
 function showUI(supported) {
@@ -58,9 +58,9 @@ function showUI(supported) {
     namesAndNumbersTextArea.addEventListener('change', () => {
       localStorage.setItem('extension-namesAndNumbers', namesAndNumbersTextArea.value);
     })
-    
+
     advancedSimpleToggle.addEventListener('click', () => {
-      browser.tabs.query({active: true, currentWindow: true}, function(tabs) {
+      browser.tabs.query({ active: true, currentWindow: true }, function (tabs) {
         browser.tabs.sendMessage(tabs[0].id, {
           from: 'popup',
           type: 'INIT_ADVANCED_MODE'
@@ -73,6 +73,7 @@ function showUI(supported) {
       // advancedInputs.hidden = !isAdvanced
       // simpleInputs.hidden = isAdvanced
     })
+    // attempt to get status info (progress) from the page every time popup is opened (will be null if not in progress)
     getStatusInfo((statusInfo) => {
       displayStatusInfo(statusInfo.progressRowIndex)
     });
@@ -86,15 +87,15 @@ function sendMessages() {
   const namesAndNumbersTextArea = document.querySelector('.numbers-and-names')
   const namesAndNumbers = getNamesAndNumbers(namesAndNumbersTextArea.value)
   const messages = getFormattedMessages(namesAndNumbers, messageTextArea.value)
-  browser.tabs.query({active: true, currentWindow: true}, function(tabs) {
-		browser.tabs.sendMessage(tabs[0].id, {
-			from: 'popup',
-			type: 'SEND_MESSAGES',
-			messages: messages,
-			sendIntervalMin,
-			sendIntervalMax
-		});
-	});
+  browser.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+    browser.tabs.sendMessage(tabs[0].id, {
+      from: 'popup',
+      type: 'SEND_MESSAGES',
+      messages: messages,
+      sendIntervalMin,
+      sendIntervalMax
+    });
+  });
 }
 
 function getNamesAndNumbers(textAreaValue) {
@@ -130,18 +131,20 @@ browser.runtime.onMessage.addListener(
   function (request, sender, sendResponse) {
     if (request.funcName === 'displayStatusInfo') {
       const progressRowIndex = request?.args?.progressRowIndex
-      displayStatusInfo(progressRowIndex)
+      const mode = request?.args?.mode
+      displayStatusInfo(progressRowIndex, mode)
     }
   }
 );
 
-function displayStatusInfo(progressRowIndex) {
+function displayStatusInfo(progressRowIndex, mode) {
   const namesAndNumbersTextArea = document.querySelector('.numbers-and-names')
   const namesAndNumbers = getNamesAndNumbers(namesAndNumbersTextArea.value)
   const namesAndNumbersStatusInfo = document.querySelector('.numbers-and-names-status-info')
   const messageTextArea = document.querySelector('.message')
   const sendMessagesButton = document.querySelector('.send-messages')
   const conditionsInput = document.querySelector('#i-agree-that-i-have-read-the-google-messages-terms-and-conditions-and-am-fully-responsible-for-my-use-of-this-extension')
+  const advancedToggle = document.querySelector('.advanced-simple-toggle')
 
   if (typeof progressRowIndex !== 'number') {
     namesAndNumbersTextArea.hidden = false;
@@ -149,6 +152,7 @@ function displayStatusInfo(progressRowIndex) {
     namesAndNumbersStatusInfo.textContent = '';
     messageTextArea.disabled = false;
     conditionsInput.disabled = false;
+    advancedToggle.disabled = false;
   } else {
     namesAndNumbersStatusInfo.textContent = '';
     namesAndNumbersTextArea.hidden = true;
@@ -156,24 +160,29 @@ function displayStatusInfo(progressRowIndex) {
     messageTextArea.disabled = true;
     sendMessagesButton.disabled = true;
     conditionsInput.disabled = true;
+    conditionsInput.checked = false;
+    advancedToggle.disabled = true;
 
-    namesAndNumbersTextArea.value.split('\n').forEach((line, i) => {
-      const progressRow = document.createElement('div')
-      const prefixSpan = document.createElement('span')
-      prefixSpan.classList.add('prefix')
-      progressRow.appendChild(prefixSpan)
-      const progressText = document.createElement('span')
-      progressText.textContent = line
-      if (progressRowIndex > i) {
-        prefixSpan.classList.add('completed')
-      } else if (progressRowIndex === i) {
-        prefixSpan.classList.add('spinner')
-        progressText.style.textDecoration = 'underline'
-      } else if (progressRowIndex < i) {
-        progressText.style.color = 'gray'
-      }
-      progressRow.appendChild(progressText)
-      namesAndNumbersStatusInfo.appendChild(progressRow)
-    })
+    if (mode === 'popup-mode') {
+      namesAndNumbersTextArea.value.split('\n').forEach((line, i) => {
+        const progressRow = document.createElement('div')
+        const prefixSpan = document.createElement('span')
+        prefixSpan.classList.add('prefix')
+        progressRow.appendChild(prefixSpan)
+        const progressText = document.createElement('span')
+        progressText.textContent = line
+        if (progressRowIndex > i) {
+          prefixSpan.classList.add('completed')
+        } else if (progressRowIndex === i) {
+          prefixSpan.classList.add('spinner')
+          progressText.style.textDecoration = 'underline'
+        } else if (progressRowIndex < i) {
+          progressText.style.color = 'gray'
+        }
+        progressRow.appendChild(progressText)
+        namesAndNumbersStatusInfo.appendChild(progressRow)
+      })
+      namesAndNumbersStatusInfo.querySelector('.spinner').scrollIntoView()
+    }
   }
 }

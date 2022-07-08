@@ -2,34 +2,48 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="../vendor/light.css">
   <title>Church Bulk SMS</title>
   <style>
     :root {
-      --popup-width: 300px;
+      --popup-width: 320px;
     }
     body {
       width: var(--popup-width);
+      margin: 0;  
     }
-    textarea {
-      margin: 0px; width: var(--popup-width); height: 70px;
+    textarea, .numbers-and-names-status-info {
+      margin: 0px;
+      width: var(--popup-width);
+      height: 70px;
+      font-family: Courier, monospace;
+    }
+    .numbers-and-names-status-info {
+      overflow-y: auto;
+      background: #efefef;
+      line-height: 1.25em;
+    }
+    .tip > pre {
+      margin-top: 4px;
     }
     button {
       margin-top: 1em;
       margin-bottom: 2em;
     }
-    .small-note {
-      text-align: right;
-    }
     h2 {
       margin-bottom: 0.25em;
     }
     .advanced-simple-toggle {
+      all: unset;
       padding-left: 2ch;
       font-size: 50%;
       color: blue;
       text-decoration: underline;
       cursor: pointer;
-    } 
+    }
+    .send-messages {
+      margin-bottom: 1em;
+    }
     .completed:before {
       content: '✓';
       color: green;
@@ -47,10 +61,10 @@
       color: orange;
     }
     .prefix {
-      margin-right: 8px;
-    }
-    .numbers-and-names-status-info {
-      font-family: 'Courier New', Courier, monospace;
+      display: inline-block;
+      margin-left: 4px;
+      margin-right: 4px;
+      width: 2ch;
     }
     @keyframes rotation {
       from {
@@ -59,6 +73,9 @@
       to {
         transform: rotate(359deg);
       }
+    }
+    [for="i-agree-that-i-have-read-the-google-messages-terms-and-conditions-and-am-fully-responsible-for-my-use-of-this-extension"] {
+      font-size: 65%;
     }
   </style>
 </head>
@@ -75,11 +92,11 @@
   <div class="ui" hidden>
     <div class="input-group">
       <h2>Message</h2>
-      <textarea placeholder="e.g. Hello {name}! Can you bring a dish or desert to the church potluck next Wednesday at 7pm?" class="message"></textarea>
+      <textarea placeholder="e.g. Hi {name}! Can you bring a dish or desert to the church potluck next Wednesday at 7pm?" class="message"></textarea>
       <div class="tip">If you add "{name}" to your message it will be replaced by the corresponding name.</div>
     </div>
     <div class="input-group">
-      <h2><span class="advanced-simple-heading">Numbers, names</span><small class="advanced-simple-toggle">Switch to Advanced</small></h2>
+      <h2><span class="advanced-simple-heading">Numbers, names</span><small><button type="button" class="advanced-simple-toggle">Switch to Advanced</button></small></h2>
       <div class="simple-inputs">
         <textarea placeholder="e.g. 1234567890, John Smith
 (111) 111 1111
@@ -89,7 +106,7 @@
         <div class="tip">Example:
           <pre>(123) 456-7890, John Smith
 (111) 111 1111
-(987) 654 3210, Jane</pre>
+9876543210, Jane</pre>
         </div>
       </div>
       <div hidden class="advanced-inputs">
@@ -99,9 +116,6 @@
       <input id="i-agree-that-i-have-read-the-google-messages-terms-and-conditions-and-am-fully-responsible-for-my-use-of-this-extension" type="checkbox" />
       <label for="i-agree-that-i-have-read-the-google-messages-terms-and-conditions-and-am-fully-responsible-for-my-use-of-this-extension">I agree that I have read <a target="_blank" href="https://policies.google.com/terms">the Google Messages terms and conditions</a> and am fully responsible for my use of this extension.</label>
       <button disabled class="send-messages">Send Messages</button>
-    </div>
-    <div class="small-note">
-      <small>Inspired by <a target="_blank" href="https://brismuth.com/how-to-send-bulk-customized-text-messages-with-google-voice-67b1b5b0ffe7">Google Voice Bulk Texter</a></small>
     </div>
   </div>
 </body>

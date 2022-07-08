@@ -195,8 +195,7 @@ browser.runtime.onMessage.addListener(async (message, sender, response) => {
           return acc
         }, [])
         console.log(dedupedPreparedMessagesAndNumbers)
-        await sendAllMessages(dedupedPreparedMessagesAndNumbers, 2500, 10000)
-        alert(`Done sending messages`)
+        await sendAllMessages(dedupedPreparedMessagesAndNumbers, 2500, 10000, 'csv-mode')
       })
     }, csvInput, drop)
   }
@@ -270,7 +269,17 @@ function treatMessagesAndNumbers(messagesAndNumbers) {
   })
 }
 
-async function sendAllMessages(messagesAndNumbers, sendIntervalMin, sendIntervalMax) {
+function sendStatusToPopup(progressRowIndex = 0, mode) {
+  statusInfo = progressRowIndex === null ? null : { progressRowIndex, mode }
+  browser.runtime.sendMessage({ funcName: 'displayStatusInfo', args: statusInfo })
+}
+
+async function sendAllMessages(messagesAndNumbers, sendIntervalMin, sendIntervalMax, mode = 'popup-mode') {
+  // reset status information
+  const sendStatus = (progressRowIndex) => sendStatusToPopup(progressRowIndex, mode) // shortcut to not pass mode every time
+  sendStatus(null)
+  sendStatus(0)
+
   // get to the right page
   const messagesStartPage = '/web/conversations/new'
   if (location.pathname !== messagesStartPage) {
@@ -278,12 +287,6 @@ async function sendAllMessages(messagesAndNumbers, sendIntervalMin, sendInterval
     document.querySelector('[data-e2e-start-button]').click()
     await till(() => location.pathname === messagesStartPage)
   }
-
-  // reset status information
-  browser.runtime.sendMessage({ funcName: 'displayStatusInfo', args: null })
-  statusInfo = null
-  browser.runtime.sendMessage({ funcName: 'displayStatusInfo', args: { progressRowIndex: 0 } })
-  statusInfo = { progressRowIndex: 0 }
 
   const n = messagesAndNumbers.length; // number of times to call promise
   await sequentialPromiseAll(
@@ -294,8 +297,7 @@ async function sendAllMessages(messagesAndNumbers, sendIntervalMin, sendInterval
     argsHandle, // modify this in the callback to change the arguments at the next invocation
     _previousResponse, // what is resolved from promise
     i) => {
-    browser.runtime.sendMessage({ funcName: 'displayStatusInfo', args: { progressRowIndex: i } })
-    statusInfo = { progressRowIndex: i }
+    sendStatus(i)
 
     argsHandle[0] = messagesAndNumbers[i].message;
     argsHandle[1] = messagesAndNumbers[i].numbers;
@@ -303,11 +305,11 @@ async function sendAllMessages(messagesAndNumbers, sendIntervalMin, sendInterval
     argsHandle[3] = sendIntervalMax;
   });
 
-  browser.runtime.sendMessage({ funcName: 'displayStatusInfo', args: { progressRowIndex: n } })
-  statusInfo = { progressRowIndex: n }
+  sendStatus(n)
+  alert(`Done sending messages`)
   await timeout(1000)
-  browser.runtime.sendMessage({ funcName: 'displayStatusInfo', args: null })
-  statusInfo = null
+  sendStatus(null)
+
 }
 
 function sendGroupMessageAndWait(message, numberOrNumbers, waitMin, waitMax) {

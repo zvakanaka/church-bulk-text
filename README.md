@@ -8,3 +8,4 @@
 ## Thank You
 Inspired by [this similar extension](https://github.com/brismuth/google-voice-bulk-texter)  
 Icons from [openmoji.org](https://openmoji.org/library/#search=text&emoji=E248)
+CSS from [kognise/water.css](https://github.com/kognise/water.css)
