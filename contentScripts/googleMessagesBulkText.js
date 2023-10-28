@@ -407,5 +407,8 @@ async function continueToConversation() {
 }
 async function sendMessage() {
   await till(() => document.querySelector('[data-e2e-send-text-button]:not([disabled])'))
-  document.querySelector('[data-e2e-send-text-button]').click()
+  document.querySelector('[data-e2e-send-text-button]').dispatchEvent(new Event('sendClicked', {
+    bubbles: true,
+    cancelable: true
+  }));
 }
