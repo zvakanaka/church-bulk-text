@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Church Bulk Text",
   "description": "Send templated text messages through Google Messages using your phone number.",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "web_accessible_resources": [{
     "resources": [],
     "matches": [],
